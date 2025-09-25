@@ -1,0 +1,60 @@
+{
+  "name": "confluent-kafka-nest",
+  "description": "NestJS Kafka module with Confluent client and Schema Registry support.",
+  "version": "0.1.0",
+  "type": "commonjs",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "require": "./dist/index.js",
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "npm run clean && tsc -p tsconfig.build.json",
+    "clean": "rimraf dist",
+    "prepublishOnly": "npm run build",
+    "lint": "eslint .",
+    "test": "echo \"(placeholder)\""
+  },
+  "keywords": [
+    "nestjs",
+    "kafka",
+    "confluent",
+    "schema-registry",
+    "avro"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ParmentierChristophe/nestjs-kafka-confluent.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ParmentierChristophe/nestjs-kafka-confluent/issues"
+  },
+  "homepage": "https://github.com/ParmentierChristophe/nestjs-kafka-confluent#readme",
+  "author": "Parmentier Christophe <christophe-parmentier@laposte.net>",
+  "peerDependencies": {
+    "@nestjs/common": ">=11.0.0 <12",
+    "@nestjs/core": ">=11.0.0 <12"
+  },
+  "peerDependenciesMeta": {
+    "@nestjs/common": {
+      "optional": false
+    },
+    "@nestjs/core": {
+      "optional": false
+    }
+  },
+  "dependencies": {
+    "@confluentinc/schemaregistry": "^1.3.1",
+    "@confluentinc/kafka-javascript": "^1.3.1"
+  },
+  "devDependencies": {
+    "@nestjs/common": "11.1.6",
+    "@nestjs/core": "11.1.6",
+    "typescript": "^5",
+    "rimraf": "^5"
+  }
+}
