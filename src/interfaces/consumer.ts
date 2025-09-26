@@ -1,10 +1,10 @@
 import type { AvroDeserializerConfig } from "@confluentinc/schemaregistry";
-import type { IHeaders } from "@confluentinc/kafka-javascript/types/kafkajs";
+import { DecodedHeaders } from "./header";
 
 export interface DeserializedMessage<TKey = unknown, TValue = unknown> {
   key: TKey | null;
   value: TValue | null;
-  headers?: IHeaders;
+  headers?: DecodedHeaders;
   timestamp: string;
   topic: string;
   partition: number;

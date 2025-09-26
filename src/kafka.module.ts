@@ -3,12 +3,21 @@ import { createKafkaClient } from "./factories/kafka.factory";
 import { createSchemaRegistryClient } from "./factories/registry.factory";
 import { KafkaProducerService } from "./services/producer.service";
 import { KafkaConsumerService } from "./services/consumer.service";
-import { KAFKA_OPTIONS, KAFKA, SCHEMA_REGISTRY, AVRO_SERIALIZER, AVRO_DESERIALIZER, KAFKA_LOGGER } from "./kafka.token";
+import {
+  KAFKA_OPTIONS,
+  KAFKA,
+  SCHEMA_REGISTRY,
+  AVRO_SERIALIZER,
+  AVRO_DESERIALIZER,
+  KAFKA_LOGGER,
+  HEADER_DECODER,
+} from "./kafka.token";
 import { AvroSerializerFactory } from "./factories/avro-serializer.factory";
 import { AvroDeserializerFactory } from "./factories/avro-deserializer.factory";
 import type { SchemaRegistryClient, AvroSerializerConfig } from "@confluentinc/schemaregistry";
 import type { ConfluentKafkaModuleAsyncOptions, ConfluentKafkaModuleOptions } from "./interfaces";
 import { Logger, LoggerService } from "@nestjs/common";
+import { HeaderDecoderFactory } from "./factories/kafka-string-deserializer.factory";
 
 @Module({})
 export class KafkaModule {
@@ -70,6 +79,13 @@ export class KafkaModule {
       useFactory: (registry: SchemaRegistryClient) => new AvroDeserializerFactory(registry),
     };
 
+    const headerDeserializerFactoryProvider: Provider = {
+      provide: HEADER_DECODER,
+      useFactory: () => {
+        return new HeaderDecoderFactory();
+      },
+    };
+
     const defaultLoggerProvider: Provider = {
       provide: KAFKA_LOGGER,
       useFactory: (): LoggerService => new Logger("Kafka"),
@@ -81,6 +97,7 @@ export class KafkaModule {
       registryProvider,
       serializerProvider,
       deserializerFactoryProvider,
+      headerDeserializerFactoryProvider,
       defaultLoggerProvider,
       KafkaProducerService,
       KafkaConsumerService,

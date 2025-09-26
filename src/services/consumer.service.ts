@@ -1,10 +1,10 @@
 import { Inject, Injectable, LoggerService, OnModuleDestroy } from "@nestjs/common";
 import type { KafkaJS as Confluent } from "@confluentinc/kafka-javascript";
-import { AVRO_DESERIALIZER, KAFKA, KAFKA_LOGGER } from "../kafka.token";
-import type { IHeaders } from "@confluentinc/kafka-javascript/types/kafkajs";
+import { AVRO_DESERIALIZER, HEADER_DECODER, KAFKA, KAFKA_LOGGER } from "../kafka.token";
 import { SubscribeOptions, MessageHandler, BatchMessageHandler, DeserializedMessage } from "../interfaces";
 import { KafkaConsumerClientOptions, BatchHandler } from "../interfaces/internal/kafka-consumer-client.types";
 import { AvroDeserializerFactory, AvroDeserializerPair } from "../factories/avro-deserializer.factory";
+import { HeaderDecoder, HeaderDecoderFactory } from "../factories/kafka-string-deserializer.factory";
 
 @Injectable()
 export class KafkaConsumerService implements OnModuleDestroy {
@@ -18,6 +18,7 @@ export class KafkaConsumerService implements OnModuleDestroy {
   constructor(
     @Inject(KAFKA) private readonly kafka: Confluent.Kafka,
     @Inject(AVRO_DESERIALIZER) private readonly deserializerFactory: AvroDeserializerFactory,
+    @Inject(HEADER_DECODER) private readonly headerDecoderFactory: HeaderDecoderFactory,
     @Inject(KAFKA_LOGGER) private readonly kafkaLogger: LoggerService
   ) {}
 
@@ -68,6 +69,7 @@ export class KafkaConsumerService implements OnModuleDestroy {
     handler: MessageHandler<TKey, TValue>
   ): Promise<void> {
     const deser = this.deserializerFactory.create<TKey, TValue>(config.topic, config.avro);
+    const headerDecoder: HeaderDecoder = this.headerDecoderFactory.create();
 
     return this.subscribe(
       config.topic,
@@ -80,11 +82,12 @@ export class KafkaConsumerService implements OnModuleDestroy {
             offset: m.offset,
             kind: "value",
           });
+          const decodedHeaders = headerDecoder.decodeHeaders(m.headers);
 
           await handler({
             key,
             value,
-            headers: m.headers as IHeaders | undefined,
+            headers: decodedHeaders,
             timestamp: m.timestamp ?? "",
             topic: batch.topic,
             partition: batch.partition,
@@ -110,6 +113,7 @@ export class KafkaConsumerService implements OnModuleDestroy {
     handler: BatchMessageHandler<TKey, TValue>
   ): Promise<void> {
     const deser = this.deserializerFactory.create<TKey, TValue>(config.topic, config.avro);
+    const headerDecoder: HeaderDecoder = this.headerDecoderFactory.create();
 
     return this.subscribe(
       config.topic,
@@ -130,10 +134,12 @@ export class KafkaConsumerService implements OnModuleDestroy {
             kind: "value",
           });
 
+          const decodedHeaders = headerDecoder.decodeHeaders(message.headers);
+
           deserializedMessages.push({
             key,
             value,
-            headers: message.headers as IHeaders | undefined,
+            headers: decodedHeaders,
             timestamp: message.timestamp ?? "",
             topic: batch.topic,
             partition: batch.partition,

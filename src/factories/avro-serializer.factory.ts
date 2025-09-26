@@ -3,6 +3,11 @@ import type { AvroSerializerConfig } from "@confluentinc/schemaregistry/dist/ser
 import { Inject, Injectable } from "@nestjs/common";
 import { SCHEMA_REGISTRY } from "../kafka.token";
 
+export type AvroSerializerPair<TKey = unknown, TValue = unknown> = {
+  serializeKey: (data: TKey) => Promise<Buffer>;
+  serializeValue: (data: TValue) => Promise<Buffer>;
+};
+
 @Injectable()
 export class AvroSerializerFactory {
   private readonly avroSerializerConfig: AvroSerializerConfig;
@@ -14,7 +19,7 @@ export class AvroSerializerFactory {
     this.avroSerializerConfig = { ...avroConfiguration };
   }
 
-  create<TKey = unknown, TValue = unknown>(topic: string) {
+  create<TKey = unknown, TValue = unknown>(topic: string): AvroSerializerPair<TKey, TValue> {
     const keySer = new AvroSerializer(this.registry, SerdeType.KEY, this.avroSerializerConfig);
     const valSer = new AvroSerializer(this.registry, SerdeType.VALUE, this.avroSerializerConfig);
 

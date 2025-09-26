@@ -1,7 +1,7 @@
 {
   "name": "confluent-kafka-nest",
   "description": "NestJS Kafka module with Confluent client and Schema Registry support.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "commonjs",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -28,12 +28,12 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ParmentierChristophe/nestjs-kafka-confluent.git"
+    "url": "git+https://github.com/ParmentierChristophe/confluent-kafka-nest.git"
   },
   "bugs": {
-    "url": "https://github.com/ParmentierChristophe/nestjs-kafka-confluent/issues"
+    "url": "https://github.com/ParmentierChristophe/confluent-kafka-nest/issues"
   },
-  "homepage": "https://github.com/ParmentierChristophe/nestjs-kafka-confluent#readme",
+  "homepage": "https://github.com/ParmentierChristophe/confluent-kafka-nest#readme",
   "author": "Parmentier Christophe <christophe-parmentier@laposte.net>",
   "peerDependencies": {
     "@nestjs/common": ">=11.0.0 <12",
